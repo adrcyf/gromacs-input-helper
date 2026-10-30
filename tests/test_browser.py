@@ -62,6 +62,9 @@ class BrowserRegression(unittest.TestCase):
         self.imp('molecule', '[ moleculetype ]\nCO2 3\n[ atoms ]\n1 C 1 CO2 C 1 0 12')
         self.assertFalse(self.imp('molecule', '[ moleculetype ]\nA 3\n[ moleculetype ]\nB 3')['ok'])
         self.assertEqual(self.js('Helper.topForms.molecule.fields.name.value'), 'CO2')
+        self.imp('topol', '[ system ]\nKeep me\n[ molecules ]\nWAT 1')
+        self.assertFalse(self.imp('topol', '#include \"atomtypes.itp\"\n[ defaults ]\n1 2 no 1 1')['ok'])
+        self.assertEqual(self.js('Helper.topForms.topol.fields.system.value'), 'Keep me')
 
     def test_forcefield_and_atomtypes(self):
         text = '[ defaults ]\n1 2 no 0 1\n[ atomtypes ]\nC 12 0 A 0.3 0.2\nO 8 16 -0.5 A 0.2 0\nV dummy 0 0 0 V 0 0\n'
@@ -76,6 +79,8 @@ class BrowserRegression(unittest.TestCase):
         self.assertEqual(rows[2]['mass'], '0')
         self.assertIn('V dummy 0 0 0 V 0 0', self.js('Helper.sections.atomtypes.generate()'))
         self.assertIn('#include "atomtypes.itp"', self.js('Helper.sections.forcefield.generate()'))
+        self.assertTrue(self.imp('atomtypes', text)['ok'])
+        self.assertEqual(self.js('Helper.topForms.atomtypes.fields.comb.value'), '2')
 
     def test_molecule_blocks_and_unsupported(self):
         text = '''[ moleculetype ]
