@@ -46,12 +46,46 @@ class BrowserRegression(unittest.TestCase):
         result = self.imp('nvt', 'integrator = unusual-method\nnst_log = 10\nnst-log = 20\nunknown-thing = 3')
         self.assertTrue(result['ok'])
         self.assertTrue(any('重复' in w for w in result['warnings']))
-        self.assertTrue(any('不支持' in w for w in result['warnings']))
+        self.assertEqual(self.js('Helper.mdpForms.nvt.tables.extra.getRows()[0].values'), {'key': 'unknown-thing', 'value': '3'})
         self.assertEqual(self.js('Helper.mdpForms.nvt.fields.dt.value'), '')
         self.assertEqual(self.js('Helper.mdpForms.nvt.fields.nsteps.value'), '')
         self.assertEqual(self.js('Helper.mdpForms.nvt.fields["nstlog"].value'), '20')
         self.assertEqual(self.js('Helper.mdpForms.nvt.fields.integrator.value'), 'unusual-method')
         self.assertIsNone(self.js('Helper.sections.nvt.generate()'))
+
+    def test_extra_mdp_parameter_is_editable_and_exported(self):
+        result = self.imp('em', 'integrator=steep\nnsteps=10\nemtol=100\ncustom-option=0\n')
+        self.assertTrue(result['ok'], result)
+        self.js("Helper.mdpForms.em.tables.extra.getRows()[0].inputs.value.value = '42'")
+        self.assertIn('custom-option = 42', self.js('Helper.sections.em.generate()'))
+
+    def test_mdp_methods_custom_value_and_zero(self):
+        self.assertTrue(self.imp('em', 'integrator=steep\nnsteps=0\nemtol=100\ncutoff-scheme=group\nns-type=simple\npbc=no\n')['ok'])
+        field = self.page.locator('#em [data-key="coulombtype"]').locator('..')
+        field.get_by_role('button', name='填写其他值…').click()
+        field.get_by_label('静电方法：其他值').fill('custom-method')
+        field.get_by_role('button', name='使用此值').click()
+        output = self.js('Helper.sections.em.generate()')
+        for line in ('nsteps = 0', 'cutoff-scheme = group', 'ns-type = simple', 'pbc = no', 'coulombtype = custom-method'):
+            self.assertIn(line, output)
+        self.assertEqual(self.js("[...document.querySelectorAll('#em select')].filter(e => !e.closest('.field').querySelector('.method-edit')).length"), 0)
+
+    def test_mdp_duplicate_extra_and_unknown_only_rejected(self):
+        self.assertTrue(self.imp('em', 'integrator=steep\nnsteps=10\nemtol=100')['ok'])
+        self.js("Helper.mdpForms.em.tables.extra.set([{key:'nsteps', value:'5'}])")
+        self.assertIsNone(self.js('Helper.sections.em.generate()'))
+        self.assertFalse(self.imp('em', 'unknown-parameter=123')['ok'])
+        self.assertEqual(self.js('Helper.mdpForms.em.fields.nsteps.value'), '10')
+
+    def test_atomtype_columns_follow_nbfunc_for_new_rows(self):
+        table = self.page.locator('#atomtypes [data-table="atomtypes"]')
+        self.js("Helper.topForms.atomtypes.fields.nbfunc.value='2'; Helper.topForms.atomtypes.fields.nbfunc.dispatchEvent(new Event('change',{bubbles:true}))")
+        table.get_by_role('button', name='＋ 添加一行').click()
+        state = self.js("""() => {const t=Helper.topForms.atomtypes.tables.atomtypes; const row=t.getRows().at(-1); return Object.fromEntries(['v','w','a','b','c'].map(k=>[k,row.inputs[k].closest('td').hidden]));}""")
+        self.assertEqual(state, {'v':True, 'w':True, 'a':False, 'b':False, 'c':False})
+        self.js("Helper.topForms.atomtypes.fields.nbfunc.value='1'; Helper.topForms.atomtypes.fields.nbfunc.dispatchEvent(new Event('change',{bubbles:true}))")
+        state = self.js("""() => {const t=Helper.topForms.atomtypes.tables.atomtypes; const row=t.getRows().at(-1); return Object.fromEntries(['v','w','a','b','c'].map(k=>[k,row.inputs[k].closest('td').hidden]));}""")
+        self.assertEqual(state, {'v':False, 'w':False, 'a':True, 'b':True, 'c':True})
 
     def test_rejections_preserve_form(self):
         self.imp('forcefield', '[ defaults ]\n1 2 no 0 1\n')
@@ -98,14 +132,79 @@ WAT 2
 '''
         result = self.imp('molecule', text, 'water.itp')
         self.assertTrue(result['ok'])
-        self.assertTrue(any('不支持' in w for w in result['warnings']))
         self.assertEqual(self.js('Helper.topForms.molecule.fields.filename.value'), 'water.itp')
         self.assertTrue(self.js('Helper.topForms.molecule.blocks.constraints.enabled.checked'))
         self.assertTrue(self.js('Helper.topForms.molecule.blocks.virtual_sites2.enabled.checked'))
         out = self.js('Helper.sections.molecule.generate()')
         self.assertIn('1 2 1 0.1', out)
         self.assertIn('4 2 3 1 0.5', out)
-        self.assertNotIn('1 3 9', out)
+        self.assertIn('1 3 9 0.1', out)
+
+    def test_buckingham_defaults_and_atomtypes_round_trip(self):
+        text = """[ defaults ]
+2 2 no 0 1 0
+[ atomtypes ]
+X 12 0 A 0 2 3
+Y 8 16 -0.5 A 4 5 6
+Z bonded 6 12 0 A 7 8 9
+"""
+        result = self.imp('forcefield', text)
+        self.assertTrue(result['ok'], result)
+        self.assertEqual(self.js('Helper.topForms.forcefield.fields.nbfunc.value'), '2')
+        self.assertEqual(self.js('Helper.topForms.atomtypes.fields.nbfunc.value'), '2')
+        self.assertEqual(self.js('Helper.topForms.forcefield.fields.rep.value'), '0')
+        self.assertIn('2 2 no 0 1 0', self.js('Helper.sections.forcefield.generate()'))
+        output = self.js('Helper.sections.atomtypes.generate()')
+        for line in ('X 12 0 A 0 2 3', 'Y 8 16 -0.5 A 4 5 6', 'Z bonded 6 12 0 A 7 8 9'):
+            self.assertIn(line, output)
+        self.js("Helper.topForms.atomtypes.tables.atomtypes.getRows()[0].inputs.a.value = '10'")
+        self.assertIn('X 12 0 A 10 2 3', self.js('Helper.sections.atomtypes.generate()'))
+        self.assertTrue(self.imp('forcefield', '[ defaults ]\n1 2 no 0 1\n#include \"atomtypes.itp\"\n')['ok'])
+        self.assertEqual(self.js('Helper.topForms.forcefield.fields.rep.value'), '')
+        self.assertIn('1 2 no 0 1\n', self.js('Helper.sections.forcefield.generate()'))
+
+    def test_molecule_other_functions_and_b_state_round_trip(self):
+        text = """[ moleculetype ]
+M 3
+[ atoms ]
+1 C 1 M C 1 0 12 CB 0 0
+2 C 1 M C2 1 0 12
+[ bonds ]
+1 2 2 0.1 200
+1 2 99 0 42
+"""
+        self.assertTrue(self.imp('molecule', text)['ok'])
+        rows = self.js('Helper.topForms.molecule.blocks.bonds.table.getRows().map(r=>r.values)')
+        self.assertEqual([(r['func'], r['params']) for r in rows], [('2', '0.1 200'), ('99', '0 42')])
+        output = self.js('Helper.sections.molecule.generate()')
+        for line in ('1 C 1 M C 1 0 12 CB 0 0', '2 C 1 M C2 1 0 12', '1 2 2 0.1 200', '1 2 99 0 42'):
+            self.assertIn(line, output)
+        self.js("Helper.topForms.molecule.blocks.bonds.table.getRows()[1].inputs.params.value = '0 43'")
+        self.assertIn('1 2 99 0 43', self.js('Helper.sections.molecule.generate()'))
+
+    def test_bonds_without_explicit_parameters_use_type_lookup(self):
+        text = """[ moleculetype ]
+M 3
+[ atoms ]
+1 C 1 M C 1 0 12
+2 C 1 M C2 1 0 12
+[ bonds ]
+1 2 5
+1 2 1
+"""
+        self.assertTrue(self.imp('molecule', text)['ok'])
+        rows = self.js('Helper.topForms.molecule.blocks.bonds.table.getRows().map(r=>r.values)')
+        self.assertEqual([r['paramSource'] for r in rows], ['lookup', 'lookup'])
+        output = self.js('Helper.sections.molecule.generate()')
+        self.assertIn('1 2 5\n', output)
+        self.assertIn('1 2 1\n', output)
+
+    def test_lowercase_pme_retains_related_parameters(self):
+        result = self.imp('em', 'integrator=steep\nnsteps=10\nemtol=100\ncoulombtype=pme\nfourierspacing=0.12\npme_order=4\newald_rtol=1e-5\n')
+        self.assertTrue(result['ok'], result)
+        output = self.js('Helper.sections.em.generate()')
+        for line in ('coulombtype = pme', 'fourierspacing = 0.12', 'pme_order = 4', 'ewald_rtol = 1e-5'):
+            self.assertIn(line, output)
 
     def test_topol_paths_and_partial(self):
         result = self.imp('topol', '#include "ff/forcefield.itp"\n#include "water.itp"\n[ system ]\nWater\n[ molecules ]\nWAT 0\n')

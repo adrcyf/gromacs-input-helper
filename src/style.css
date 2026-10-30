@@ -3,3 +3,4 @@
 .parameter-name{display:block;color:#6d8381;font:11px/1.5 Consolas,monospace;margin-top:3px}
 
 .import-panel{margin:20px 0 24px;padding:17px 18px;background:#f5f8f6;border:1px solid #d9e5df;border-radius:7px}.import-panel h3{margin:0;font-size:17px}.import-panel .note{margin:5px 0 12px}.import-panel textarea{display:block;margin:12px 0;font:13px/1.6 Consolas,"Microsoft YaHei",monospace;min-height:95px}.import-panel p[aria-live]{font-size:13px;color:#526f67;overflow-wrap:anywhere;max-height:200px;overflow:auto}
+.method-edit{margin-top:5px;padding:3px 7px;font-size:12px}.method-entry{margin-top:6px}.method-entry input{margin-bottom:6px}

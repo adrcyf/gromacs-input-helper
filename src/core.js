@@ -20,7 +20,14 @@
   const tip=H.el('button',{class:'info',type:'button',title:s.tip||s.label,'aria-label':s.label+'：查看解释','aria-expanded':'false'},'ⓘ');
   const detail=H.el('div',{class:'help',id:id+'-help',hidden:''},s.help||s.tip||'请按所选模型或研究条件填写；空白可选项不输出。');
   tip.setAttribute('aria-controls',detail.id);tip.onclick=()=>{detail.hidden=!detail.hidden;tip.setAttribute('aria-expanded',String(!detail.hidden));};
-  const header=H.el('div',{class:'field-label'});header.append(label,tip);box.append(header,input);if(parent.tagName!=='TD')box.append(H.el('small',{class:'parameter-name'},s.key));box.append(detail);parent.append(box);return input;
+  const header=H.el('div',{class:'field-label'});header.append(label,tip);box.append(header,input);if(parent.tagName!=='TD')box.append(H.el('small',{class:'parameter-name'},s.key));box.append(detail);
+  if(s.type==='select' && s.editable){
+   const edit=H.el('button',{type:'button',class:'small method-edit'},'填写其他值…'),row=H.el('div',{class:'method-entry',hidden:''}),value=H.el('input',{type:'text',autocomplete:'off','aria-label':s.label+'：其他值',placeholder:'按 2018.8 文档填写方法名'}),apply=H.el('button',{type:'button',class:'small'},'使用此值');
+   edit.onclick=()=>{row.hidden=!row.hidden;if(!row.hidden)value.focus();};
+   apply.onclick=()=>{const v=value.value.trim();if(!v)return;if(![...input.options].some(o=>o.value===v))input.append(H.el('option',{value:v},v+'（自填，请核对）'));input.value=v;input.dispatchEvent(new Event('change',{bubbles:true}));row.hidden=true;};
+   row.append(value,apply);box.append(edit,row);
+  }
+  parent.append(box);return input;
  };
  H.table=(parent,s)=>{
   const group=H.el('div',{class:'table-group','data-table':s.key});if(s.title)group.append(H.el('h4',{},s.title));

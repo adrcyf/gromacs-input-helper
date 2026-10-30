@@ -3,7 +3,8 @@
 .parameter-name{display:block;color:#6d8381;font:11px/1.5 Consolas,monospace;margin-top:3px}
 
 .import-panel{margin:20px 0 24px;padding:17px 18px;background:#f5f8f6;border:1px solid #d9e5df;border-radius:7px}.import-panel h3{margin:0;font-size:17px}.import-panel .note{margin:5px 0 12px}.import-panel textarea{display:block;margin:12px 0;font:13px/1.6 Consolas,"Microsoft YaHei",monospace;min-height:95px}.import-panel p[aria-live]{font-size:13px;color:#526f67;overflow-wrap:anywhere;max-height:200px;overflow:auto}
-</style></head><body><div class="layout"><aside><div class="eyebrow">GROMACS 2018.8</div><div class="brand">参数填写助手</div><div class="nav-title">选择要填写的文件</div><nav id="file-nav"><a href="#directory">填写目录与使用方式</a></nav><p class="sidebar-note">同一页面上下填写。<br>数值留空，方法可改。<br>ⓘ 悬停看简释，点击看详细解释。<br>关闭或刷新后不保留内容。</p></aside><main><header id="directory"><div class="eyebrow">从资料到文件</div><h1>把查到的参数，填成输入文件</h1><p>选择左侧文件，手动填写或导入已有内容，核对后生成并复制。原子、分子连接和坐标支持逐行编辑；暂时不用的区块保持关闭。</p><p class="note">导入只处理本页支持的字段：缺项留空，不支持的参数会提示。再次生成只包含已映射的内容。数值依据文献、模型与研究条件填写，可选项留空时程序可能采用默认设置。</p><p class="note">此页适用于常见经典固定拓扑模型，不是完整的GROMACS预处理器；不自动拟合参数或启动模拟。所有文件均在浏览器本地处理，不上传或保存。</p><p class="note">复制后用记事本保存为对应的 .itp、.top、.gro 或 .mdp；保存类型选“所有文件”，避免多出 .txt 扩展名。</p><div class="steps"><span>① 查资料或导入文件</span><span>② 核对字段与解释</span><span>③ 修改参数</span><span>④ 生成并复制</span></div></header><div id="sections"></div><footer>方法与单位依据 <a href="https://manual.gromacs.org/documentation/2018.8/user-guide/mdp-options.html">GROMACS 2018.8 参数文档</a>及<a href="https://manual.gromacs.org/documentation/2018.8/manual-2018.8.pdf">同版拓扑手册</a>。<br>此工具整理已知数据，不替代模型来源核实与实际预处理检查。<a href="https://github.com/adrcyf/gromacs-input-helper">源码与使用说明</a></footer></main></div><a href="#directory" class="back-top">↑ 返回目录</a><script>(() => {
+.method-edit{margin-top:5px;padding:3px 7px;font-size:12px}.method-entry{margin-top:6px}.method-entry input{margin-bottom:6px}
+</style></head><body><div class="layout"><aside><div class="eyebrow">GROMACS 2018.8</div><div class="brand">参数填写助手</div><div class="nav-title">选择要填写的文件</div><nav id="file-nav"><a href="#directory">填写目录与使用方式</a></nav><p class="sidebar-note">同一页面上下填写。<br>数值留空，方法可改。<br>ⓘ 悬停看简释，点击看详细解释。<br>关闭或刷新后不保留内容。</p></aside><main><header id="directory"><div class="eyebrow">从资料到文件</div><h1>把查到的参数，填成输入文件</h1><p>选择左侧文件，手动填写或导入已有内容，核对后生成并复制。原子、分子连接和坐标支持逐行编辑；暂时不用的区块保持关闭。defaults 的第一列 nbfunc 也可修改；更换势函数后，原子类型参数列同步变化。</p><p class="note">导入会将已支持的字段回填；额外 MDP 参数保留在可编辑表格，相互作用的其他函数可通过函数号与原始参数填写。缺项留空，未处理内容会提示；再次生成只包含已映射的内容。数值依据文献、模型与研究条件填写，可选项留空时程序可能采用默认设置。</p><p class="note">此页适用于常见经典固定拓扑模型，不是完整的GROMACS预处理器；不自动拟合参数或启动模拟。所有文件均在浏览器本地处理，不上传或保存。</p><p class="note">复制后用记事本保存为对应的 .itp、.top、.gro 或 .mdp；保存类型选“所有文件”，避免多出 .txt 扩展名。</p><div class="steps"><span>① 查资料或导入文件</span><span>② 核对字段与解释</span><span>③ 修改参数</span><span>④ 生成并复制</span></div></header><div id="sections"></div><footer>方法与单位依据 <a href="https://manual.gromacs.org/documentation/2018.8/user-guide/mdp-options.html">GROMACS 2018.8 参数文档</a>及<a href="https://manual.gromacs.org/2018-current/manual-2018.8.pdf">同版拓扑手册</a>。<br>此工具整理已知数据，不替代模型来源核实与实际预处理检查。<a href="https://github.com/adrcyf/gromacs-input-helper">源码与使用说明</a></footer></main></div><a href="#directory" class="back-top">↑ 返回目录</a><script>(() => {
  'use strict';
  const H=window.Helper={sections:{}}; let serial=0;
  H.clearImported=id=>{const s=H.sections[id];if(!s)return;s.output.value='';s.output.hidden=true;s.output.nextElementSibling.hidden=true;s.element.querySelectorAll('.error').forEach(e=>e.remove());s.element.querySelectorAll('[aria-invalid]').forEach(e=>e.removeAttribute('aria-invalid'));s.element.querySelector('.status').textContent='已导入，请核对后生成。';s.body.dispatchEvent(new Event('input',{bubbles:true}));};
@@ -25,7 +26,14 @@
   const tip=H.el('button',{class:'info',type:'button',title:s.tip||s.label,'aria-label':s.label+'：查看解释','aria-expanded':'false'},'ⓘ');
   const detail=H.el('div',{class:'help',id:id+'-help',hidden:''},s.help||s.tip||'请按所选模型或研究条件填写；空白可选项不输出。');
   tip.setAttribute('aria-controls',detail.id);tip.onclick=()=>{detail.hidden=!detail.hidden;tip.setAttribute('aria-expanded',String(!detail.hidden));};
-  const header=H.el('div',{class:'field-label'});header.append(label,tip);box.append(header,input);if(parent.tagName!=='TD')box.append(H.el('small',{class:'parameter-name'},s.key));box.append(detail);parent.append(box);return input;
+  const header=H.el('div',{class:'field-label'});header.append(label,tip);box.append(header,input);if(parent.tagName!=='TD')box.append(H.el('small',{class:'parameter-name'},s.key));box.append(detail);
+  if(s.type==='select' && s.editable){
+   const edit=H.el('button',{type:'button',class:'small method-edit'},'填写其他值…'),row=H.el('div',{class:'method-entry',hidden:''}),value=H.el('input',{type:'text',autocomplete:'off','aria-label':s.label+'：其他值',placeholder:'按 2018.8 文档填写方法名'}),apply=H.el('button',{type:'button',class:'small'},'使用此值');
+   edit.onclick=()=>{row.hidden=!row.hidden;if(!row.hidden)value.focus();};
+   apply.onclick=()=>{const v=value.value.trim();if(!v)return;if(![...input.options].some(o=>o.value===v))input.append(H.el('option',{value:v},v+'（自填，请核对）'));input.value=v;input.dispatchEvent(new Event('change',{bubbles:true}));row.hidden=true;};
+   row.append(value,apply);box.append(edit,row);
+  }
+  parent.append(box);return input;
  };
  H.table=(parent,s)=>{
   const group=H.el('div',{class:'table-group','data-table':s.key});if(s.title)group.append(H.el('h4',{},s.title));
@@ -57,13 +65,17 @@
   'use strict';
   H.topForms = H.topForms || {};
   const details = {
+    nbfunc:'defaults 第一列：1 使用 Lennard-Jones，2 使用 Buckingham。它决定非键势的形式，与第二列混合规则是不同设置；切换不会换算参数。GROMACS 2018.8 的 Buckingham 需要配套 group 截断方案等设置。',
+    rep:'defaults 可选第六列：LJ 排斥项的指数，省略为 12；非 12 设置涉及算法支持，须按模型和手册核对。Buckingham 不用这个指数描述排斥项。',
+    typeB:'可选的 B 状态原子类型，用于自由能等涉及两套状态的模型；普通模拟留空。此工具要求填写 B 态时同时明确其电荷和质量。',
+    chargeB:'B 状态的电荷，单位 e；按 B 状态模型填写，允许负数和零。', massB:'B 状态的质量，单位 u；按模型填写，可为零。',
     comb:'混合规则决定同类参数的表示和异类相互作用的混合方式。规则 1 使用 C6/C12，规则 2 和 3 使用 sigma/epsilon；必须与力场定义一致，切换不会转换数值。',
     pairs:'控制是否根据普通 LJ 参数生成缺失的 1-4 LJ 参数，并不自动生成 pairs 位点清单；遵循力场设置。',
     fudgeLJ:'1-4 LJ 相互作用的缩放因子，无量纲；依照所用力场填写，0 是有效值。', fudgeQQ:'1-4 静电相互作用的缩放因子，无量纲；依照所用力场填写，0 是有效值。',
     include:'自定义原子类型文件的相对路径或力场可解析路径；包含在全局 defaults 后、分子定义前。',
     bonded:'可选的成键类型名；按力场定义填写。', atomic:'原子序数，按模型类型填写；虚拟位点请核对模型的原子序数。', mass:'质量，单位 u；虚拟位点质量可以为 0，须遵循模型的质量分配。',
     charge:'电荷，单位 e，可为负数或零。原子类型表中是默认值；分子 atoms 表中是该位点实际使用的电荷，可覆盖类型默认值。',
-    ptype:'A 表示普通原子，V 表示虚拟位点；依据模型选择。', v:'LJ 的第一参数：规则 1 是 C6，规则 2/3 是 sigma；按对应单位和模型填写非负值。', w:'LJ 的第二参数：规则 1 是 C12，规则 2/3 是 epsilon；按对应单位和模型填写非负值。',
+    ptype:'A 表示普通原子，S 表示壳层，V 或 D 表示虚拟位点；依据模型选择。', v:'LJ 的第一参数：规则 1 是 C6，规则 2/3 是 sigma；规则 2/3 的负 sigma 是特殊纯排斥表示，须依照模型填写。', w:'LJ 的第二参数：规则 1 是 C12，规则 2/3 是 epsilon；按对应单位和模型填写非负值。',
     name:'填写模型中的名称，分子类型名需与体系 molecules 表匹配；类型名和文件名称不是元素符号。', type:'填写已定义的原子类型名，与力场 atomtypes 精确匹配。', nr:'分子内原子编号从 1 开始且按行连续；须与坐标中的顺序一致。',
     resnr:'该位点所属残基的正整数编号。', residue:'该位点所属残基名称，需与模型和坐标对应。', atom:'该位点的原子名称，需与坐标顺序及模型对应。', cgnr:'电荷组编号；按模型或力场规定填写正整数。',
     nrexcl:'按成键连接自动排除分子内非键相互作用的邻接层数；不是原子数，须与力场、显式 exclusions 和 pairs 配合。',
@@ -105,48 +117,72 @@
   const indexCols = ks => ks.map(k => col(k, k + ' 原子编号', 'number'));
   const numCol = (key, label, unit) => col(key, label, 'number', {unit});
 
-  const ff = H.section('forcefield', '自定义力场规则', 'LJ 12-6 的全局规则；整个体系只能有一份 defaults。');
+  const ff = H.section('forcefield', '自定义力场规则', '非键相互作用的全局规则；整个体系只能有一份 defaults。');
   const f = {};
+  f.nbfunc = field(ff.body,'nbfunc','非键函数','select',{options:[{value:'1',label:'1：Lennard-Jones'},{value:'2',label:'2：Buckingham'}],default:'1'});
   f.comb = field(ff.body,'comb','混合规则','select',{options:[{value:'1',label:'1：C6 / C12'},{value:'2',label:'2：σ 算术、ε 几何'},{value:'3',label:'3：σ 和 ε 几何'}],default:'2'});
   f.pairs = field(ff.body,'pairs','生成缺失的 1-4 LJ 参数','select',{options:['no','yes'],default:'no'});
   f.lj = field(ff.body,'fudgeLJ','1-4 LJ 缩放因子','number',{required:true});
   f.qq = field(ff.body,'fudgeQQ','1-4 静电缩放因子','number',{required:true});
+  f.rep = field(ff.body,'rep','排斥指数 rep（第六列，可选）','number',{placeholder:'留空：LJ 使用 12'});
+  H.note(ff.body,'Buckingham 的 A、C 按几何平均、B 按调和平均混合；comb-rule 仍写入 defaults，但不控制 Buckingham 混合公式。Buckingham 与 gen-pairs 的组合须用目标版本 grompp 核验。');
   f.include = field(ff.body,'include','原子类型文件','text',{default:'atomtypes.itp',required:true});
   function generateFF(c) {
+    const nbfunc=H.str(f.nbfunc,'非键函数',true), rep=H.num(f.rep,'rep',{required:false,min:0});
+    if(!['1','2'].includes(nbfunc)) H.fail(f.nbfunc,'请选择支持的非键函数。');
     const comb=H.str(f.comb,'混合规则',true), pairs=H.str(f.pairs,'生成缺失的 1-4 LJ 参数',true);
     const lj=H.num(f.lj,'fudgeLJ',{required:true,min:0}), qq=H.num(f.qq,'fudgeQQ',{required:true,min:0});
-    return comment(c,'LJ 12-6；规则和缩放因子须与模型一致。')+'[ defaults ]\n1 '+comb+' '+pairs+' '+lj+' '+qq+'\n\n#include "'+path(f.include,'原子类型文件')+'"\n';
+    return comment(c,'非键函数、规则和缩放因子须与模型一致。')+'[ defaults ]\n'+nbfunc+' '+comb+' '+pairs+' '+lj+' '+qq+(rep===null?'':' '+rep)+'\n\n#include "'+path(f.include,'原子类型文件')+'"\n';
   }
   ff.onGenerate(generateFF); H.topForms.forcefield={fields:f,generate:generateFF};
 
   const at = H.section('atomtypes','原子类型','按所选力场填写；切换混合规则不会转换已有数值。');
   const a = {};
+  a.nbfunc = field(at.body,'nbfunc','对应的非键函数','select',{options:[{value:'1',label:'1：Lennard-Jones'},{value:'2',label:'2：Buckingham'}],default:'1'});
   a.comb = field(at.body,'comb','对应的混合规则','select',{options:[{value:'1',label:'1：C6 / C12'},{value:'2',label:'2：σ / ε'},{value:'3',label:'3：σ / ε'}],default:'2'});
-  const atTable=H.table(at.body,{key:'atomtypes',title:'原子类型',columns:[col('name','类型名'),col('bonded','成键类型名（可选）'),numCol('atomic','原子序数（可选）'),numCol('mass','质量','u'),numCol('charge','默认电荷','e'),col('ptype','粒子类型','select',{options:['','A','V']}),numCol('v','V'),numCol('w','W')],initialRows:1});
+  const atTable=H.table(at.body,{key:'atomtypes',title:'原子类型',columns:[col('name','类型名'),col('bonded','成键类型名（可选）'),numCol('atomic','原子序数（可选）'),numCol('mass','质量','u'),numCol('charge','默认电荷','e'),col('ptype','粒子类型','select',{options:['','A','S','V','D']}),numCol('v','V'),numCol('w','W'),col('a','Buckingham A','number',{unit:'kJ/mol',tip:'指数排斥项系数 A',help:'Buckingham 势 U(r)=A exp(-B r)−C/r⁶ 中的 A；单位 kJ/mol。不是虚拟位点系数。'}),col('b','Buckingham B','number',{unit:'nm⁻¹',tip:'指数衰减系数 B',help:'Buckingham 指数项 exp(-B r) 中的 B，单位 nm⁻¹，r 使用 nm。'}),col('c','Buckingham C','number',{unit:'kJ mol⁻¹ nm⁶',tip:'色散项系数 C',help:'Buckingham 势 −C/r⁶ 中的 C，单位 kJ mol⁻¹ nm⁶；不是 LJ 的 σ 或 ε。'})],initialRows:1});
   const meaning=H.el('p',{},''); at.body.appendChild(meaning);
   function updateMeaning(){
+    const buck=a.nbfunc.value==='2';
+    const ljLabels=[['1：C6 / C12','2：σ 算术、ε 几何','3：σ 和 ε 几何'],['1：C6 / C12','2：σ / ε','3：σ / ε']];
+    [f.comb,a.comb].forEach((select,i)=>{for(const option of select.options){const n=Number(option.value);if(Number.isInteger(n)&&n>=1&&n<=3) option.textContent=buck?n+'（Buckingham 使用固定混合公式）':ljLabels[i][n-1];}});
     const rule=a.comb.value, rule1=rule==='1', known=['1','2','3'].includes(rule), labels=!known?['V','W']:rule1?['C6','C12']:['σ','ε'], units=!known?['单位待确认','单位待确认']:rule1?['kJ mol⁻¹ nm⁶','kJ mol⁻¹ nm¹²']:['nm','kJ/mol'];
-    meaning.textContent=!known?'尚未提供混合规则，请按力场确认。':rule1?'V = C6（kJ mol⁻¹ nm⁶），W = C12（kJ mol⁻¹ nm¹²）。':'V = σ（nm），W = ε（kJ/mol）。';
+    meaning.textContent=a.nbfunc.value==='2'?'Buckingham：A、C 使用几何平均，B 使用调和平均；comb-rule 仍写入 defaults，但不决定 Buckingham 混合公式。':!known?'尚未提供混合规则，请按力场确认。':rule1?'V = C6（kJ mol⁻¹ nm⁶），W = C12（kJ mol⁻¹ nm¹²）。':'V = σ（nm），W = ε（kJ/mol）。';
     ['v','w'].forEach((key,i)=>{ const spec=atTable.columns.find(c=>c.key===key); spec.label=labels[i]; spec.unit=units[i]; const th=atTable.element.querySelectorAll('thead th')[atTable.columns.indexOf(spec)]; if(th) th.textContent=labels[i]+' ['+units[i]+']'; atTable.element.querySelectorAll('[data-key="'+key+'"]').forEach(input=>{const label=input.closest('.field').querySelector('label'); if(label) label.textContent=labels[i]+' ['+units[i]+']';}); });
   }
+  function updateColumns(){ const buck=a.nbfunc.value==='2'; atTable.columns.forEach((spec,i)=>{if(!['v','w','a','b','c'].includes(spec.key))return; const hide=buck?['v','w'].includes(spec.key):['a','b','c'].includes(spec.key); atTable.element.querySelectorAll('tr').forEach(tr=>{if(tr.children[i])tr.children[i].hidden=hide;});}); }
+  const addAtomType=atTable.add.bind(atTable); atTable.add=function(values){const row=addAtomType(values);updateColumns();return row;};
+  f.nbfunc.addEventListener('change',()=>{a.nbfunc.value=f.nbfunc.value;updateMeaning();updateColumns();at.body.dispatchEvent(new Event('input',{bubbles:true}));});
+  a.nbfunc.addEventListener('change',()=>{f.nbfunc.value=a.nbfunc.value;updateMeaning();updateColumns();ff.body.dispatchEvent(new Event('input',{bubbles:true}));});
   f.comb.addEventListener('change',()=>{a.comb.value=f.comb.value;updateMeaning();at.body.dispatchEvent(new Event('input',{bubbles:true}));});
-  a.comb.addEventListener('change',()=>{f.comb.value=a.comb.value;updateMeaning();ff.body.dispatchEvent(new Event('input',{bubbles:true}));}); updateMeaning();
+  a.comb.addEventListener('change',()=>{f.comb.value=a.comb.value;updateMeaning();ff.body.dispatchEvent(new Event('input',{bubbles:true}));}); updateMeaning(); updateColumns();
   function generateAT(c) {
+    if (!['1','2'].includes(a.nbfunc.value)) H.fail(a.nbfunc,'请选择支持的非键函数。');
     if (!a.comb.value) H.fail(a.comb,'请先选择与力场一致的混合规则。');
     const seen=new Set(), data=rows(atTable); if(!data.length) H.fail(a.comb,'请至少填写一行原子类型');
-    const lines=data.map(r=>{const name=tok(r,'name','类型名'); if(seen.has(name)) H.fail(r.inputs.name,'类型名重复');seen.add(name); const p=tok(r,'ptype','粒子类型'); const bonded=clean(r.inputs.bonded,'成键类型名',false); if(bonded && /\s/.test(bonded)) H.fail(r.inputs.bonded,'成键类型名不能包含空格'); const atomic=val(r,'atomic','原子序数',{required:false,integer:true,min:0}); return [name,...(bonded?[bonded]:[]),...(atomic===null?[]:[atomic]),float(r,'mass','质量',{min:0}),float(r,'charge','默认电荷'),p,float(r,'v','V',{min:0}),float(r,'w','W',{min:0})].join(' ');});
-    return comment(c,a.comb.value==='1'?'V/W 为 C6/C12。':'V/W 为 sigma/epsilon。')+'[ atomtypes ]\n'+comment(c,'类型名 [成键类型名] [原子序数] 质量[u] 默认电荷[e] 粒子类型 V W')+lines.join('\n')+'\n';
+    const lines=data.map(r=>{const name=tok(r,'name','类型名'); if(seen.has(name)) H.fail(r.inputs.name,'类型名重复');seen.add(name); const p=tok(r,'ptype','粒子类型'); const bonded=clean(r.inputs.bonded,'成键类型名',false); if(bonded && /\s/.test(bonded)) H.fail(r.inputs.bonded,'成键类型名不能包含空格'); const atomic=val(r,'atomic','原子序数',{required:false,integer:true,min:0}); return [name,...(bonded?[bonded]:[]),...(atomic===null?[]:[atomic]),float(r,'mass','质量',{min:0}),float(r,'charge','默认电荷'),p,...(a.nbfunc.value==='2'?['a','b','c'].map(k=>float(r,k,'Buckingham '+k.toUpperCase(),{min:0})):[float(r,'v','V',a.comb.value==='1'?{min:0}:{}),float(r,'w','W',{min:0})])].join(' ');});
+    return comment(c,a.nbfunc.value==='2'?'Buckingham A/B/C；A、C 几何平均，B 调和平均。':a.comb.value==='1'?'V/W 为 C6/C12。':'V/W 为 sigma/epsilon。')+'[ atomtypes ]\n'+comment(c,'类型名 [成键类型名] [原子序数] 质量[u] 默认电荷[e] 粒子类型 '+(a.nbfunc.value==='2'?'A B C':'V W'))+lines.join('\n')+'\n';
   }
   at.onGenerate(generateAT); H.topForms.atomtypes={fields:a,tables:{atomtypes:atTable},generate:generateAT};
 
-  const mol=H.section('molecule','分子定义','填写实际原子和模型需要的常见相互作用；仅支持列出的函数。');
+  const mol=H.section('molecule','分子定义','填写实际原子和模型需要的相互作用；其他函数可填写原始参数。');
   const m={}; m.filename=field(mol.body,'filename','建议文件名','text',{default:'molecule.itp'}); m.name=field(mol.body,'name','分子类型名','text',{required:true}); m.nrexcl=field(mol.body,'nrexcl','nrexcl','number',{required:true});
-  const atoms=H.table(mol.body,{key:'atoms',title:'原子 / 位点',columns:[numCol('nr','编号'),col('type','类型'),numCol('resnr','残基号'),col('residue','残基名'),col('atom','原子名'),numCol('cgnr','电荷组号'),numCol('charge','电荷','e'),numCol('mass','质量','u')],initialRows:1});
+  const atoms=H.table(mol.body,{key:'atoms',title:'原子 / 位点',columns:[numCol('nr','编号'),col('type','类型'),numCol('resnr','残基号'),col('residue','残基名'),col('atom','原子名'),numCol('cgnr','电荷组号'),numCol('charge','电荷','e'),numCol('mass','质量','u'),col('typeB','B 态类型（可选）'),numCol('chargeB','B 态电荷','e'),numCol('massB','B 态质量','u')],initialRows:1});
   const blocks={};
   function block(key,title,columns,func) {
     const box=H.el('div',{},''); mol.body.appendChild(box);
     const label=H.el('label',{},''); const enabled=H.el('input',{type:'checkbox'},''); label.appendChild(enabled); label.appendChild(document.createTextNode(' 启用 '+title)); box.appendChild(label);
+    if(func!==null) { const n=columns.findIndex(c=>!['i','j','k','l','s'].includes(c.key)); columns.splice(n<0?columns.length:n,0,col('func','函数编号（留空为 '+func+'）','number',{placeholder:String(func)})); columns.push(col('paramSource','参数填写方式','select',{options:[{value:'fields',label:'默认函数用分列；其他函数用原始列表'},{value:'lookup',label:'不写显式参数（类型表查找／无需参数）'}],help:'默认方式下，原始列表非空则优先使用，否则读取分列。选择不写显式参数时，只输出原子编号与函数号；GROMACS 需要从类型表取得参数，或该函数本身无需参数。此选择不会自动补参数。'}),col('params','原始参数列表（可选）','text')); }
     const table=H.table(box,{key,title,columns,initialRows:1});
+    if(func!==null) {
+      const named=columns.filter(c=>!['i','j','k','l','s','func','paramSource','params'].includes(c.key)).map(c=>c.key);
+      const refresh=tr=>{const inputs=tr._row.inputs, lookup=inputs.paramSource.value==='lookup', raw=inputs.params.value.trim()!==''; const fn=inputs.func.value.trim(); const hideNamed=lookup||raw||(fn!==''&&Number(fn)!==func);
+        for(const key of named){inputs[key].closest('.field').hidden=hideNamed;inputs[key].disabled=hideNamed;}
+        inputs.params.closest('.field').hidden=lookup;inputs.params.disabled=lookup;
+      };
+      const add=table.add.bind(table); table.add=function(values){const tr=add(values);tr.addEventListener('input',()=>refresh(tr));tr.addEventListener('change',()=>refresh(tr));refresh(tr);return tr;};
+      table.element.querySelectorAll('tbody tr').forEach(tr=>{tr.addEventListener('input',()=>refresh(tr));tr.addEventListener('change',()=>refresh(tr));refresh(tr);});
+    }
     table.element.hidden=true; enabled.addEventListener('change',()=>{table.element.hidden=!enabled.checked;});
     blocks[key]={enabled,table,func};
   }
@@ -160,11 +196,12 @@
   block('position_restraints','位置限制（函数 1）',[...indexCols(['i']),...['kx','ky','kz'].map(k=>numCol(k,k,'kJ/(mol nm²)'))],1);
   block('settles','刚性三位点水 SETTLE（函数 1）',[...indexCols(['i']),numCol('doh','O–H 距离','nm'),numCol('dhh','H–H 距离','nm')],1);
   block('virtual_sites2','双构造点虚拟位点（函数 1）',[...indexCols(['s','i','j']),numCol('a','系数 a')],1);
+  H.note(mol.body,'函数编号留空使用各表默认值；命名参数列仅适用于默认函数。原始参数列表非空时覆盖命名参数；其他函数请填原始参数，或明确选择不写显式参数。原始列表的顺序、单位及函数支持请按模型与手册核对。');
   H.note(mol.body,'SETTLE 要求氧之后紧接两个氢；虚拟位点还须按模型处理质量和排除。位置限制需要参考坐标。');
   function generateMol(c) {
     const name=token(m.name,'分子类型名'), n=H.num(m.nrexcl,'nrexcl',{required:true,integer:true,min:0});
     const data=rows(atoms), ids=new Set(); if(!data.length) H.fail(m.name,'请至少填写一个原子');
-    const atomLines=data.map((r,index)=>{const id=idx(r,'nr'); if(id!==index+1) H.fail(r.inputs.nr,'原子编号必须按行从 1 连续排列'); if(ids.has(id)) H.fail(r.inputs.nr,'原子编号重复'); ids.add(id); return [id,tok(r,'type','类型'),val(r,'resnr','残基号',{integer:true,min:1}),tok(r,'residue','残基名'),tok(r,'atom','原子名'),val(r,'cgnr','电荷组号',{integer:true,min:1}),float(r,'charge','电荷'),float(r,'mass','质量',{min:0})].join(' ');});
+    const atomLines=data.map((r,index)=>{const id=idx(r,'nr'); if(id!==index+1) H.fail(r.inputs.nr,'原子编号必须按行从 1 连续排列'); if(ids.has(id)) H.fail(r.inputs.nr,'原子编号重复'); ids.add(id); return [id,tok(r,'type','类型'),val(r,'resnr','残基号',{integer:true,min:1}),tok(r,'residue','残基名'),tok(r,'atom','原子名'),val(r,'cgnr','电荷组号',{integer:true,min:1}),float(r,'charge','电荷'),float(r,'mass','质量',{min:0}),...(['typeB','chargeB','massB'].some(k=>r.values[k])?[tok(r,'typeB','B 态类型'),float(r,'chargeB','B 态电荷'),float(r,'massB','B 态质量',{min:0})]:[])].join(' ');});
     const check=(r,k)=>{const x=idx(r,k);if(!ids.has(x)) H.fail(r.inputs[k],'原子编号 '+x+' 未在 atoms 中定义');return x;};
     let out=comment(c,'分子内原子编号及参数须与模型和坐标一致。')+'[ moleculetype ]\n'+comment(c,'分子类型名 nrexcl')+name+' '+n+'\n\n[ atoms ]\n'+comment(c,'编号 类型 残基号 残基名 原子名 电荷组号 电荷[e] 质量[u]')+atomLines.join('\n')+'\n';
     const specs={bonds:[['i','j'],['b0','kb']],angles:[['i','j','k'],['theta','ktheta']],dihedrals1:[['i','j','k','l'],['phase','kp','multiplicity']],dihedrals3:[['i','j','k','l'],['c0','c1','c2','c3','c4','c5']],constraints:[['i','j'],['distance']],pairs:[['i','j'],[]],position_restraints:[['i'],['kx','ky','kz']],settles:[['i'],['doh','dhh']],virtual_sites2:[['s','i','j'],['a']]};
@@ -174,8 +211,12 @@
         if(key==='exclusions') {const i=check(r,'i'), raw=clean(r.inputs.others,'其他原子编号'); const parts=raw.split(/\s+/); if(!parts.every(x=>/^\d+$/.test(x)&&Number(x)>0&&ids.has(Number(x)))) H.fail(r.inputs.others,'请输入已定义的正整数原子编号，以空格分隔'); return [i,...parts].join(' ');}
         const [indices,params]=specs[key]; const ii=indices.map(k=>check(r,k));
         if(key==='settles' && (!ids.has(ii[0]+1)||!ids.has(ii[0]+2))) H.fail(r.inputs.i,'SETTLE 氧编号后须有两个连续氢编号');
-        const pp=params.map(k=>float(r,k,k,k==='multiplicity'?{integer:true,min:1}:['b0','kb','ktheta','distance','kx','ky','kz','doh','dhh'].includes(k)?{min:0}:{}));
-        return [...ii,b.func,...pp].join(' ');
+        const fn=val(r,'func','函数编号',{required:false,integer:true,min:1}) ?? b.func; const raw=clean(r.inputs.params,'原始参数列表',false);
+        if(r.values.paramSource==='lookup') return [...ii,fn].join(' ');
+        if(raw && !raw.split(/\s+/).every(x=>Number.isFinite(Number(x)))) H.fail(r.inputs.params,'原始参数必须是空格分隔的数值。');
+        if(fn!==b.func && !raw) H.fail(r.inputs.params,'其他函数请填写原始参数列表。');
+        const pp=raw?raw.split(/\s+/):params.map(k=>float(r,k,k,k==='multiplicity'?{integer:true,min:1}:['b0','kb','ktheta','distance','kx','ky','kz','doh','dhh'].includes(k)?{min:0}:{}));
+        return [...ii,fn,...pp].join(' ');
       });
       const header=key.startsWith('dihedrals')?'dihedrals':key; out+='\n[ '+header+' ]\n'+comment(c, b.table.columns.map(x=>x.label+(x.unit?' ['+x.unit+']':'')).join(' ')+(b.func===null?'；首编号与后续编号之间排除非键作用':'；函数编号位于原子编号之后'))+lines.join('\n')+'\n';
     }
@@ -244,11 +285,17 @@
   const H = window.Helper;
   H.mdpForms = H.mdpForms || {};
   const definitions = [
+    ['include','拓扑搜索目录','text','预处理包含目录','例如 -I../parameters；只记录参数，不自动读取外部文件。'],
+    ['define','预处理宏','text','启用拓扑中的宏','例如 -DPOSRES；须与已有拓扑条件一致，不能凭空生成位置限制。'],
     ['integrator','积分算法','select','积分或最小化方法','steep 为最速下降；cg 为共轭梯度；l-bfgs 为低内存拟牛顿法。cg 和 l-bfgs 不适合含约束的模型，实际支持以 grompp 检查为准。md 为 leap-frog 积分；md-vv 为速度 Verlet 积分。'],
     ['dt','时间步','number','积分时间步','单位 ps；依据力场、最快运动和约束选择。'],
     ['nsteps','步数','number','最大迭代或模拟步数','最小化为最大迭代次数；动力学时长为 nsteps × dt。'],
     ['emtol','最大力阈值','number','最小化收敛阈值','单位 kJ mol⁻¹ nm⁻¹；按体系和后续需求选择。'],
     ['emstep','最小化步长','number','最速下降初始步长','单位 nm；依据结构与稳定性选择。'],
+    ['nstcgsteep','CG 中最速下降间隔','number','CG 中穿插最速下降的步数间隔','仅用于 cg；单位步。'],
+    ['nbfgscorr','L-BFGS 修正历史数','number','保留的修正步数','仅用于 l-bfgs，依据问题及算法设置。'],
+    ['ld-seed','随机动力学种子','number','随机动力学随机数种子','用于 SD/BD 等随机方法；-1 表示自动生成。'],
+    ['bd-fric','布朗动力学摩擦系数','number','BD 摩擦系数','单位 u/ps；0 时使用质量与 tau_t 决定摩擦。'],
     ['tcoupl','温度耦合','select','选择恒温方法','按采样目标选择；V-rescale 的 tau_t 不等同于简单温度松弛常数。'],
     ['tc-grps','温度耦合组','text','空格分隔组名','组须存在于索引中，并与每组温度参数一一对应。'],
     ['tau_t','温度耦合时间','text','每组一个正数','单位 ps；按组顺序填写，支持科学计数法。'],
@@ -266,18 +313,25 @@
     ['cutoff-scheme','邻居列表方案','select','短程邻居搜索方案','Verlet 是常见方案；结合 GROMACS 版本及力场。'],
     ['nstlist','邻居列表更新间隔','number','列表更新步数','单位 步；依据精度、时间步和性能选择。'],
     ['rlist','邻居列表距离','number','邻居搜索半径','单位 nm；Verlet 下可能由缓冲容差自动调整。'],
+    ['ns-type','邻居搜索方法','select','group 方案的邻居搜索方法','grid 为网格搜索；simple 为逐原子搜索。结合边界条件及版本核对。'],
+    ['verlet-buffer-tolerance','Verlet 缓冲容差','number','自动计算缓冲区的容差','单位 kJ/(mol ps)；-1 表示关闭自动缓冲计算，改用 rlist。'],
     ['coulombtype','静电方法','select','静电作用计算方法','按力场、周期性和体系选择；PME 使用长程网格。'],
     ['rcoulomb','静电截断距离','number','静电实空间截断','单位 nm；依据力场及精度选择。'],
+    ['coulomb-modifier','静电截断修正','select','静电势的截断修正','Potential-shift-Verlet 按邻居列表方案选择；按模型要求设置。'],
+    ['rcoulomb-switch','静电切换起点','number','静电切换的起始距离','单位 nm；仅与相应 Shift/Switch 方法配套使用。'],
     ['fourierspacing','PME 网格间距','number','目标傅里叶网格间距','单位 nm；平衡精度与计算成本。'],
     ['pme_order','PME 插值阶数','number','网格插值阶数','无量纲整数；依据目标精度和版本设置。'],
     ['ewald_rtol','Ewald 误差容差','number','实空间相对误差','无量纲；依据目标精度选择。'],
     ['epsilon_rf','反应场介电常数','number','反应场相对介电常数','无量纲；依据所用模型填写，0 表示无穷大。'],
+    ['epsilon-r','相对介电常数','number','静电作用的相对介电常数','无量纲；0 表示无穷大，不自动根据溶剂名称推定。'],
+    ['ewald-rtol-lj','LJ-PME 误差容差','number','LJ-PME 实空间误差容差','仅用于 vdwtype=PME，无量纲。'],
+    ['lj-pme-comb-rule','LJ-PME 混合规则','select','LJ-PME 倒空间混合规则','Geometric 或 Lorentz-Berthelot；需与力场及算法设置配套。'],
     ['vdwtype','范德华方法','select','范德华作用计算方法','本工具提供常见 Cut-off；核对力场规定。'],
     ['vdw-modifier','范德华修正','select','截断附近的势或力修正','必须与力场定义一致；切换方法需要设置起始距离。'],
     ['rvdw-switch','切换起始距离','number','范德华切换区起点','单位 nm；应小于 rvdw，按力场规定填写。'],
     ['rvdw','范德华截断距离','number','范德华作用截断','单位 nm；依据力场规定填写。'],
     ['DispCorr','色散修正','select','长程色散修正','依据力场和体系是否适用选取。'],
-    ['pbc','周期边界','select','边界条件','本模板面向三维周期体系。'],
+    ['pbc','周期边界','select','边界条件','xyz 为三维周期；no 为无周期；xy 仅沿 x、y 周期。不同边界需配套邻居搜索、静电和压力设置。'],
     ['constraint-algorithm','约束算法','select','LINCS 或 SHAKE','依据拓扑、约束网络和积分方案选择。'],
     ['constraints','生成约束','select','由键生成的约束','依据力场及时间步选择；显式约束和 SETTLE 仍可生效。'],
     ['lincs-order','LINCS 阶数','number','LINCS 展开阶数','无量纲整数；依据约束网络与稳定性选择。'],
@@ -294,45 +348,53 @@
     ['continuation','续接约束状态','select','是否按续接状态初始化','续接时通常结合上一阶段 checkpoint；此选项不自动续跑。']
   ];
   const selects = {
-    tcoupl:['V-rescale','no','Berendsen','Nose-Hoover'], 'comm-mode':['Linear','None','Angular'], 'cutoff-scheme':['Verlet'], coulombtype:['PME','Cut-off','Reaction-field'], vdwtype:['Cut-off'], 'vdw-modifier':['Potential-shift','None','Force-switch','Potential-switch'], DispCorr:['no','EnerPres','Ener'], pbc:['xyz'], 'constraint-algorithm':['lincs','shake'], constraints:['none','h-bonds','all-bonds','h-angles','all-angles'], pcoupl:['no','Berendsen','Parrinello-Rahman'], pcoupltype:['isotropic','semiisotropic','anisotropic'], gen_vel:['yes','no'], continuation:['no','yes']
+    tcoupl:['V-rescale','no','Berendsen','Nose-Hoover','Andersen','Andersen-massive'], 'comm-mode':['Linear','None','Angular','Linear-acceleration-correction'], 'cutoff-scheme':['Verlet','group'], 'ns-type':['grid','simple'], coulombtype:['PME','Cut-off','Reaction-field','Reaction-field-zero','Ewald','P3M-AD','Shift','Switch','Encad-Shift','User','PME-Switch','PME-User','PME-User-Switch'], 'coulomb-modifier':['Potential-shift-Verlet','Potential-shift','None'], vdwtype:['Cut-off','PME','Shift','Switch','Encad-Shift','User'], 'vdw-modifier':['Potential-shift','None','Force-switch','Potential-switch','Potential-shift-Verlet'], 'lj-pme-comb-rule':['Geometric','Lorentz-Berthelot'], DispCorr:['no','EnerPres','Ener'], pbc:['xyz','no','xy'], 'constraint-algorithm':['lincs','shake'], constraints:['none','h-bonds','all-bonds','h-angles','all-angles'], pcoupl:['no','Berendsen','Parrinello-Rahman','MTTK'], pcoupltype:['isotropic','semiisotropic','anisotropic','surface-tension'], gen_vel:['yes','no'], continuation:['no','yes']
   };
   const freq = new Set(['nstenergy','nstlog','nstcalcenergy','nstxout','nstvout','nstfout','nstxout-compressed','nstcomm','nstlist']);
-  const integers = new Set([...freq,'nsteps','pme_order','lincs-order','lincs-iter','gen_seed']);
+  const integers = new Set([...freq,'nsteps','pme_order','lincs-order','lincs-iter','gen_seed','ld-seed','nstcgsteep','nbfgscorr']);
   const titles = {em:'能量最小化',nvt:'NVT 平衡',npt:'NPT 平衡',production:'生产采样'};
-  const common = ['cutoff-scheme','nstlist','rlist','coulombtype','rcoulomb','fourierspacing','pme_order','ewald_rtol','epsilon_rf','vdwtype','vdw-modifier','rvdw-switch','rvdw','DispCorr','pbc','constraint-algorithm','constraints','lincs-order','lincs-iter','shake-tol'];
+  const common = ['include','define','cutoff-scheme','nstlist','ns-type','rlist','verlet-buffer-tolerance','coulombtype','coulomb-modifier','rcoulomb','rcoulomb-switch','fourierspacing','pme_order','ewald_rtol','epsilon-r','epsilon_rf','vdwtype','vdw-modifier','rvdw-switch','rvdw','ewald-rtol-lj','lj-pme-comb-rule','DispCorr','pbc','constraint-algorithm','constraints','lincs-order','lincs-iter','shake-tol'];
   const md = ['integrator','dt','nsteps','tcoupl','tc-grps','tau_t','ref_t','nstenergy','nstlog','nstcalcenergy','nstxout','nstvout','nstfout','nstxout-compressed','compressed-x-precision','comm-mode','nstcomm'];
   const ending = ['pcoupl','pcoupltype','tau_p','ref_p','compressibility','gen_vel','gen_temp','gen_seed','continuation'];
   for (const id of Object.keys(titles)) {
     const isEM = id === 'em';
-    const section = H.section(id,titles[id],'常见固定拓扑、三维周期体系的教学模板；数值请依据体系、力场和模拟目标填写。');
-    const keys = isEM ? ['integrator','nsteps','emtol','emstep',...common] : [...md,...common,...ending];
+    const section = H.section(id,titles[id],'经典固定拓扑模型的常用设置；方法可选或自填，更多参数可在末尾逐行添加。数值请依据体系、力场和模拟目标填写。');
+    const keys = isEM ? ['integrator','nsteps','emtol','emstep','nstcgsteep','nbfgscorr',...common] : [...md,'ld-seed','bd-fric',...common,...ending];
     const fields = {}, meta = {};
     keys.forEach(key => {
       const d = definitions.find(x => x[0] === key);
       let options = selects[key], def = '';
-      if (key === 'integrator') { options = isEM ? ['steep','cg','l-bfgs'] : ['md','md-vv']; def = options[0]; }
-      else if (options) { if (isEM && key === 'constraint-algorithm') options = ['lincs']; if (isEM && key === 'constraints') options = ['none','h-bonds','all-bonds']; def = options[0]; }
+      if (key === 'integrator') { options = isEM ? ['steep','cg','l-bfgs'] : ['md','md-vv','md-vv-avek','sd','bd']; def = options[0]; }
+      else if (options) { def = options[0]; }
       if (key === 'tc-grps') def = 'System';
       if (key === 'pcoupl' && id === 'npt') def = 'Parrinello-Rahman';
       if (key === 'gen_vel' && id !== 'nvt') def = 'no';
       if (key === 'continuation' && id !== 'nvt') def = 'yes';
       const units = {dt:'ps',emtol:'kJ mol⁻¹ nm⁻¹',emstep:'nm',tau_t:'ps',ref_t:'K',tau_p:'ps',ref_p:'bar',compressibility:'bar⁻¹',gen_temp:'K',rlist:'nm',rcoulomb:'nm',rvdw:'nm','rvdw-switch':'nm',fourierspacing:'nm'};
-      fields[key] = H.field(section.body,{key,label:d[1],type:d[2],options,default:def,required:['nsteps','dt','emtol'].includes(key),unit:units[key],tip:d[3],help:d[4],placeholder:d[2]==='text' && key!=='tc-grps'?'空格分隔，支持科学计数法':''});
+      fields[key] = H.field(section.body,{key,label:d[1],type:d[2],options,editable:d[2]==='select',default:def,required:['nsteps','dt','emtol'].includes(key),unit:units[key],tip:d[3],help:d[4],placeholder:d[2]==='text' && key!=='tc-grps'?'按字段说明填写':''});
       meta[key]=d;
     });
     H.note(section.body,'留空的可选参数不会写入 MDP，GROMACS 将采用其版本对应的默认值；留空不表示物理作用为零或关闭。');
+    H.note(section.body,'下拉框列出 2018.8 的常见方法；“填写其他值”可保留其他方法名。选择方法不等于组合有效，User 势、特殊边界和其他算法仍需配套文件及 grompp 检查。');
+    const extra=H.table(section.body,{key:'extra',title:'更多 MDP 参数（可选，按参数名逐行填写）',columns:[{key:'key',label:'参数名',tip:'填写文档中的参数名',help:'例如 nsttcouple；本表不自动验证额外参数的物理含义或版本支持。已有专用字段请在上方修改，避免重复。'},{key:'value',label:'参数值',tip:'数值、方法名或空格分隔的值',help:'按 GROMACS 2018.8 文档填写。0 和负数会原样保留；空白行不输出。'}],initialRows:1});
     function update() {
       const toggle=(key,visible)=>{if(fields[key]) H.toggle(fields[key],visible);};
+      const value=key=>(fields[key]?.value||'').toLowerCase();
       if (!isEM) {
-        const tc=!!fields.tcoupl.value && fields.tcoupl.value.toLowerCase() !== 'no'; ['tc-grps','tau_t','ref_t'].forEach(k=>toggle(k,tc));
+        const stochastic=['sd','bd'].includes(value('integrator'));
+        const tc=stochastic || (!!fields.tcoupl.value && value('tcoupl') !== 'no'); ['tc-grps','tau_t','ref_t'].forEach(k=>toggle(k,tc)); toggle('tcoupl',!stochastic); toggle('ld-seed',stochastic); toggle('bd-fric',value('integrator')==='bd');
         const pc=!!fields.pcoupl.value && fields.pcoupl.value.toLowerCase() !== 'no'; ['pcoupltype','tau_p','ref_p','compressibility'].forEach(k=>toggle(k,pc));
-        const gv=fields.gen_vel.value === 'yes'; ['gen_temp','gen_seed'].forEach(k=>toggle(k,gv));
+        const gv=value('gen_vel') === 'yes'; ['gen_temp','gen_seed'].forEach(k=>toggle(k,gv));
       }
-      const pme=fields.coulombtype.value === 'PME'; ['fourierspacing','pme_order','ewald_rtol'].forEach(k=>toggle(k,pme));
-      toggle('epsilon_rf',fields.coulombtype.value === 'Reaction-field');
-      toggle('rvdw-switch',['Force-switch','Potential-switch'].includes(fields['vdw-modifier'].value));
-      const lin=fields['constraint-algorithm'].value === 'lincs'; ['lincs-order','lincs-iter'].forEach(k=>toggle(k,lin)); toggle('shake-tol',fields['constraint-algorithm'].value === 'shake');
-      toggle('emstep',isEM && fields.integrator.value === 'steep');
+      const pme=/^(pme|p3m|ewald)/.test(value('coulombtype')) || value('vdwtype')==='pme'; ['fourierspacing','pme_order','ewald_rtol'].forEach(k=>toggle(k,pme));
+      ['ewald-rtol-lj','lj-pme-comb-rule'].forEach(k=>toggle(k,value('vdwtype')==='pme'));
+      toggle('ns-type',value('cutoff-scheme')==='group'); toggle('verlet-buffer-tolerance',value('cutoff-scheme')==='verlet');
+      toggle('epsilon_rf',/^reaction-field/.test(value('coulombtype')));
+      toggle('rcoulomb-switch',/shift|switch/.test(value('coulombtype')));
+      toggle('rvdw-switch',['force-switch','potential-switch'].includes(value('vdw-modifier'))||['shift','switch'].includes(value('vdwtype')));
+      const lin=value('constraint-algorithm') === 'lincs'; ['lincs-order','lincs-iter'].forEach(k=>toggle(k,lin)); toggle('shake-tol',value('constraint-algorithm') === 'shake');
+      toggle('emstep',isEM && value('integrator') === 'steep');
+      toggle('nstcgsteep',isEM && value('integrator')==='cg'); toggle('nbfgscorr',isEM && value('integrator')==='l-bfgs');
     }
     Object.values(fields).forEach(f=>f.addEventListener('change',update)); update();
     function list(key,count,kind) {
@@ -350,23 +412,32 @@
         if (['tau_t','ref_t','ref_p','compressibility'].includes(key)) continue;
         if (meta[key][2] === 'number') {
           const required=['nsteps','dt','emtol','tau_p','gen_temp','rvdw-switch'].includes(key);
-          const n=H.num(f,meta[key][1],{required,integer:integers.has(key),min:key==='gen_seed'?-1:key==='pme_order'?2:['nstlist','lincs-order'].includes(key)?1:(freq.has(key)||['nsteps','lincs-iter','epsilon_rf','rvdw-switch'].includes(key)?0:Number.MIN_VALUE)});
+          const n=H.num(f,meta[key][1],{required,integer:integers.has(key),min:['gen_seed','ld-seed','nsteps','verlet-buffer-tolerance'].includes(key)?-1:key==='pme_order'?2:['lincs-order','nbfgscorr'].includes(key)?1:(freq.has(key)||['nstcgsteep','lincs-iter','epsilon_rf','epsilon-r','rlist','rcoulomb','rvdw','rvdw-switch','rcoulomb-switch','bd-fric'].includes(key)?0:Number.MIN_VALUE)});
           if(n!==null) vals[key]=f.value.trim();
         } else { const v=H.str(f,meta[key][1],key === 'integrator'); if(/[\r\n;<>]/.test(v)) H.fail(f,'请勿输入换行、分号或占位符。'); if(v) vals[key]=v; }
       }
-      if (!isEM && fields['constraint-algorithm'].value === 'lincs' && ['h-angles','all-angles'].includes(fields.constraints.value)) H.fail(fields.constraints,'角约束不能使用 LINCS；请选择 SHAKE 或改为键约束。');
-      if(!isEM && fields.tcoupl.value && fields.tcoupl.value.toLowerCase() !== 'no') {
+      if (fields['constraint-algorithm'].value.toLowerCase() === 'lincs' && ['h-angles','all-angles'].includes(fields.constraints.value.toLowerCase())) H.fail(fields.constraints,'角约束不能使用 LINCS；请选择 SHAKE 或改为键约束。');
+      if(!isEM && (['sd','bd'].includes(fields.integrator.value.toLowerCase()) || (fields.tcoupl.value && fields.tcoupl.value.toLowerCase() !== 'no'))) {
         const groups=H.str(fields['tc-grps'],meta['tc-grps'][1],true).split(/\s+/); if(groups.some(x=>!x)) H.fail(fields['tc-grps'],'请填写温度耦合组。');
-        vals.tau_t=list('tau_t',groups.length,'positive'); vals.ref_t=list('ref_t',groups.length,'positive');
+        vals.tau_t=list('tau_t',groups.length,'any'); vals.ref_t=list('ref_t',groups.length,'nonnegative');
       }
       if(!isEM && fields.pcoupl.value && fields.pcoupl.value.toLowerCase() !== 'no') {
-        const type=H.str(fields.pcoupltype,meta.pcoupltype[1],true); const count={isotropic:1,semiisotropic:2,anisotropic:6}[type];
+        const type=H.str(fields.pcoupltype,meta.pcoupltype[1],true).toLowerCase(); const count={isotropic:1,semiisotropic:2,anisotropic:6,'surface-tension':2}[type];
         vals.ref_p=list('ref_p',count,'any'); vals.compressibility=list('compressibility',count,'nonnegative');
       }
       if(vals['rvdw-switch']!==undefined && vals.rvdw!==undefined && Number(vals['rvdw-switch'])>=Number(vals.rvdw)) H.fail(fields['rvdw-switch'],'切换起始距离必须小于范德华截断距离。');
-      return keys.filter(k=>Object.prototype.hasOwnProperty.call(vals,k)).map(k=>`${k} = ${vals[k]}${comments?' ; '+meta[k][3]+'。'+meta[k][4]:''}`).join('\n')+'\n';
+      const canon=s=>s.toLowerCase().replace(/[-_]/g,''), used=new Set(keys.map(canon)), lines=[];
+      for(const r of extra.getRows()){
+        if(!r.values.key && !r.values.value)continue;
+        const key=H.str(r.inputs.key,'额外参数名',true), value=H.str(r.inputs.value,'额外参数值',true);
+        if(!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(key))H.fail(r.inputs.key,'请填写一个参数名，例如 nsttcouple。');
+        if(/[\r\n;]/.test(value))H.fail(r.inputs.value,'参数值请写在同一行，注释放在文件外说明。');
+        if(used.has(canon(key)))H.fail(r.inputs.key,'参数重复；已有专用字段请在上方修改。');
+        used.add(canon(key));lines.push(key+' = '+value+(comments?' ; 额外参数；按 2018.8 文档核对。':''));
+      }
+      return [...keys.filter(k=>Object.prototype.hasOwnProperty.call(vals,k)).map(k=>`${k} = ${vals[k]}${comments?' ; '+meta[k][3]+'。'+meta[k][4]:''}`),...lines].join('\n')+'\n';
     }
-    H.mdpForms[id]={fields,generate,update}; section.onGenerate(generate);
+    H.mdpForms[id]={fields,tables:{extra},generate,update}; section.onGenerate(generate);
   }
 })();
 
@@ -376,16 +447,17 @@ const canon=s=>s.toLowerCase().replace(/[-_]/g,'');
 function set(input,value,warnings,label){if(H.setImported){H.setImported(input,value,warnings,label);return;} value=value==null?'':String(value); if(input.tagName==='SELECT' && ![...input.options].some(o=>o.value===value)){const o=H.el('option',{value},value||'（空）');o.dataset.imported='true';input.append(o);if(value)warnings.push(label+'：保留不支持的选项 '+value);} if(input.type==='number'&&value&&!Number.isFinite(Number(value))){warnings.push(label+'：数值 '+value+' 无法填写，已留空');value='';} input.value=value;}
 function clear(id){const form=H.mdpForms[id]||H.topForms[id]; Object.values(form.fields||{}).forEach(x=>set(x,'',[],'')); Object.values(form.tables||{}).forEach(t=>t.set([])); Object.values(form.blocks||{}).forEach(b=>{b.enabled.checked=false;b.table.set([]);b.enabled.dispatchEvent(new Event('change'));}); if(H.clearImported)H.clearImported(id);}
 function rows(table,values,warnings,label){table.set(values);table.getRows().forEach((r,i)=>Object.entries(r.inputs).forEach(([k,input])=>set(input,values[i][k]??'',warnings,label+' '+k)));}
-function parseMdp(id,text,w){const fields=H.mdpForms[id].fields, keys=Object.fromEntries(Object.keys(fields).map(k=>[canon(k),k])), values={}, seen={};let count=0; text.split(/\r?\n/).forEach((line,i)=>{line=line.split(';')[0].trim();if(!line)return;if(line.startsWith('#')){w.push('未处理指令（第 '+(i+1)+' 行）：'+line);return;}const pos=line.indexOf('=');if(pos<0){w.push('未处理内容（第 '+(i+1)+' 行）：'+line);return;}const raw=line.slice(0,pos).trim(),key=canon(raw),v=line.slice(pos+1).trim();if(!keys[key]){w.push('不支持的参数 '+raw+'（第 '+(i+1)+' 行）');return;}if(seen[key])w.push('重复参数 '+raw+'（第 '+(i+1)+' 行），采用最后值');seen[key]=true;values[keys[key]]=v;count++;});if(!count)return null;const integrator=(values.integrator||'').toLowerCase();if(integrator && ((id==='em'&&['md','md-vv'].includes(integrator))||(id!=='em'&&['steep','cg','l-bfgs'].includes(integrator))))w.push('积分方法与所选最小化/动力学页面不一致，请核对。');return {count,apply(){clear(id);Object.entries(values).forEach(([k,v])=>set(fields[k],v,w,k));Object.values(fields).forEach(x=>x.dispatchEvent(new Event('change',{bubbles:true})));}};}
+function parseMdp(id,text,w){const form=H.mdpForms[id],fields=form.fields,keys=Object.fromEntries(Object.keys(fields).map(k=>[canon(k),k])), values={},extra={},seen={};let count=0,knownCount=0; text.split(/\r?\n/).forEach((line,i)=>{line=line.split(';')[0].trim();if(!line)return;if(line.startsWith('#')){w.push('未处理指令（第 '+(i+1)+' 行）：'+line);return;}const pos=line.indexOf('=');if(pos<0){w.push('未处理内容（第 '+(i+1)+' 行）：'+line);return;}const raw=line.slice(0,pos).trim(),key=canon(raw),v=line.slice(pos+1).trim();if(!key){w.push('未处理内容（第 '+(i+1)+' 行）：'+line);return;}if(seen[key])w.push('重复参数 '+raw+'（第 '+(i+1)+' 行），采用最后值');seen[key]=true;if(keys[key]){values[keys[key]]=v;knownCount++;}else extra[key]={key:raw,value:v};count++;});if(!knownCount){if(count)w.push('仅发现额外参数，无法确认文件类型，表单未更改。');return null;}Object.values(extra).forEach(x=>w.push('额外参数原样保留，请核对2018.8：'+x.key));const integrator=(values.integrator||'').toLowerCase();if(integrator && ((id==='em'&&['md','md-vv'].includes(integrator))||(id!=='em'&&['steep','cg','l-bfgs'].includes(integrator))))w.push('积分方法与所选最小化/动力学页面不一致，请核对。');return {count,apply(){clear(id);Object.entries(values).forEach(([k,v])=>set(fields[k],v,w,k));if(form.tables?.extra)rows(form.tables.extra,Object.values(extra),w,'extra');Object.values(fields).forEach(x=>x.dispatchEvent(new Event('change',{bubbles:true})));}};}
 function topology(id,text,filename,w){if(/^\s*#\s*(?:if|ifdef|ifndef|else|elif|endif)\b/im.test(text))throw Error('请提供选定分支或展开后内容，工具不执行条件预处理');const sections={},includes=[];let section='', moleculeHeaders=0;text.split(/\r?\n/).forEach((raw,i)=>{const line=raw.split(';')[0].trim();if(!line)return;const inc=line.match(/^#\s*include\s*["<]([^">]+)[">]/i);if(inc){includes.push(inc[1]);return;}const h=line.match(/^\[\s*([^\]]+)\s*\]$/);if(h){section=h[1].trim().toLowerCase();if(section==='moleculetype')moleculeHeaders++;(sections[section]??=[]);return;}if(line.startsWith('#')){w.push('未处理指令（第 '+(i+1)+' 行）：'+line);return;}if(section)(sections[section]??=[]).push({v:line.split(/\s+/),raw:line,line:i+1});});const known={forcefield:['defaults','atomtypes'],atomtypes:['atomtypes','defaults'],molecule:['moleculetype','atoms','bonds','angles','dihedrals','constraints','pairs','exclusions','position_restraints','settles','virtual_sites2'],topol:['system','molecules']}[id];Object.keys(sections).filter(k=>!known.includes(k)).forEach(k=>w.push('未支持的段落 ['+k+']'));let count=0, updated=[id], data={};
-if(id==='forcefield'){const d=sections.defaults?.[0];if(!d)return null;if(d.v[0]!=='1')throw Error('defaults 的 nbfunc '+d.v[0]+' 不受支持；无法按 LJ 12-6 导入');data.fields={comb:d.v[1],pairs:d.v[2],lj:d.v[3],qq:d.v[4],include:includes[0]};count++;if(sections.atomtypes?.length){updated.push('atomtypes');if(!includes.length){data.fields.include='atomtypes.itp';w.push('内联类型拆到原子类型区，请分别生成并保存 atomtypes.itp。');}else w.push('内联类型拆到原子类型区，请分别生成并保存，并核对 include 路径。');}}
-if(id==='atomtypes'||(id==='forcefield'&&updated.includes('atomtypes'))){data.at=[];for(const r of sections.atomtypes||[]){const p=r.v;if(p.length<6||p.length>8){w.push('atomtypes 第 '+r.line+' 行列数不支持');continue;}const pre=p.slice(0,-5), tail=p.slice(-5);let obj={name:pre[0],mass:tail[0],charge:tail[1],ptype:tail[2],v:tail[3],w:tail[4]};if(pre.length===2){if(/^\d+$/.test(pre[1]))obj.atomic=pre[1];else obj.bonded=pre[1];}if(pre.length===3){obj.bonded=pre[1];obj.atomic=pre[2];}data.at.push(obj);count++;}if(id==='atomtypes'&&!data.at.length)return null;if(id==='atomtypes'){data.atComb=sections.defaults?.[0]?.v[1];if(!data.atComb)w.push('原子类型未提供混合规则，请与力场规则对应后填写。');}}
-if(id==='molecule'){const mt=sections.moleculetype||[];if(mt.length>1||moleculeHeaders>1)throw Error('包含多个 moleculetype，无法导入单分子表单');if(!mt.length&&!sections.atoms?.length)return null;data.fields={filename:filename||'',name:mt[0]?.v[0],nrexcl:mt[0]?.v[1]};data.atoms=(sections.atoms||[]).map(r=>{if(r.v.length>8)w.push('atoms 第 '+r.line+' 行含不支持的 B 状态列，已忽略');return Object.fromEntries(['nr','type','resnr','residue','atom','cgnr','charge','mass'].map((k,i)=>[k,r.v[i]]));});data.blocks={};const specs={bonds:[2,['i','j','b0','kb']],angles:[3,['i','j','k','theta','ktheta']],constraints:[2,['i','j','distance']],pairs:[2,['i','j']],position_restraints:[1,['i','kx','ky','kz']],settles:[1,['i','doh','dhh']],virtual_sites2:[3,['s','i','j','a']],dihedrals:[4,[]]};for(const [name,entries] of Object.entries(sections)){if(name==='exclusions'){data.blocks.exclusions=entries.map(r=>({i:r.v[0],others:r.v.slice(1).join(' ')}));continue;}if(!specs[name])continue;for(const r of entries){let [idx,keys]=specs[name],func=r.v[idx],target=name;if(name==='dihedrals'){target='dihedrals'+func;keys=func==='1'?['i','j','k','l','phase','kp','multiplicity']:['i','j','k','l','c0','c1','c2','c3','c4','c5'];}if(!H.topForms.molecule.blocks[target]||String(H.topForms.molecule.blocks[target].func)!==func){w.push(name+' 第 '+r.line+' 行函数 '+(func||'（缺失）')+' 不支持，已跳过');continue;}const v=[...r.v.slice(0,idx),...r.v.slice(idx+1)];if(v.length>keys.length)w.push(name+' 第 '+r.line+' 行额外列不支持，已忽略');(data.blocks[target]??=[]).push(Object.fromEntries(keys.map((k,i)=>[k,v[i]])));}}count=mt.length+data.atoms.length+Object.values(data.blocks).reduce((n,x)=>n+x.length,0);}
+if(id==='forcefield'){const d=sections.defaults?.[0];if(!d)return null;data.fields={nbfunc:d.v[0],comb:d.v[1],pairs:d.v[2],lj:d.v[3],qq:d.v[4],rep:d.v[5],include:includes[0]};count++;if(sections.atomtypes?.length){updated.push('atomtypes');if(!includes.length){data.fields.include='atomtypes.itp';w.push('内联类型拆到原子类型区，请分别生成并保存 atomtypes.itp。');}else w.push('内联类型拆到原子类型区，请分别生成并保存，并核对 include 路径。');}}
+if(id==='atomtypes'||(id==='forcefield'&&updated.includes('atomtypes'))){data.at=[];const declared=sections.defaults?.[0]?.v[0];for(const r of sections.atomtypes||[]){const p=r.v,positions=[];for(let i=3;i<p.length;i++)if(/^[ASVD]$/i.test(p[i])&&[2,3].includes(p.length-i-1)&&i<=5)positions.push(i);if(positions.length!==1){w.push('atomtypes 第 '+r.line+' 行无法确定粒子类型和参数列，请核对');continue;}const ix=positions[0],n=p.length-ix-1,nb=declared||String(n===3?2:1);if(!['1','2'].includes(nb)||n!==(nb==='2'?3:2)){w.push('atomtypes 第 '+r.line+' 行参数列与 nbfunc 不一致，请核对');continue;}const pre=p.slice(0,ix-2),obj={name:pre[0],mass:p[ix-2],charge:p[ix-1],ptype:p[ix]};if(pre.length===2){if(/^\d+$/.test(pre[1]))obj.atomic=pre[1];else obj.bonded=pre[1];}if(pre.length===3){obj.bonded=pre[1];obj.atomic=pre[2];}if(nb==='2')[obj.a,obj.b,obj.c]=p.slice(ix+1);else [obj.v,obj.w]=p.slice(ix+1);data.at.push(obj);count++;}if(id==='atomtypes'&&!data.at.length)return null;data.atNb=declared;data.atComb=sections.defaults?.[0]?.v[1];if(!data.atComb)w.push('原子类型未提供混合规则，请与力场规则对应后填写。');if(!declared)w.push('原子类型未提供 nbfunc，请根据力场确认后填写。');}
+if(id==='molecule'){const mt=sections.moleculetype||[];if(mt.length>1||moleculeHeaders>1)throw Error('包含多个 moleculetype，无法导入单分子表单');if(!mt.length&&!sections.atoms?.length)return null;data.fields={filename:filename||'',name:mt[0]?.v[0],nrexcl:mt[0]?.v[1]};data.atoms=(sections.atoms||[]).map(r=>{if(r.v.length>11)w.push('atoms 第 '+r.line+' 行含额外列，请核对');return Object.fromEntries(['nr','type','resnr','residue','atom','cgnr','charge','mass','typeB','chargeB','massB'].map((k,i)=>[k,r.v[i]]));});data.blocks={};const specs={bonds:[2,['i','j','b0','kb']],angles:[3,['i','j','k','theta','ktheta']],constraints:[2,['i','j','distance']],pairs:[2,['i','j']],position_restraints:[1,['i','kx','ky','kz']],settles:[1,['i','doh','dhh']],virtual_sites2:[3,['s','i','j','a']],dihedrals:[4,[]]};for(const [name,entries] of Object.entries(sections)){if(name==='exclusions'){data.blocks.exclusions=entries.map(r=>({i:r.v[0],others:r.v.slice(1).join(' ')}));continue;}if(!specs[name])continue;for(const r of entries){let [idx,keys]=specs[name],func=r.v[idx],target=name;if(name==='dihedrals'){target=func==='3'?'dihedrals3':'dihedrals1';keys=target==='dihedrals1'?['i','j','k','l','phase','kp','multiplicity']:['i','j','k','l','c0','c1','c2','c3','c4','c5'];}const block=H.topForms.molecule.blocks[target];if(!block){w.push(name+' 第 '+r.line+' 行无法导入，请核对');continue;}const indices=keys.slice(0,idx),params=r.v.slice(idx+1),obj=Object.fromEntries(indices.map((k,i)=>[k,r.v[i]]));obj.func=func;if(!params.length)obj.paramSource='lookup';if(String(block.func)!==func||params.length>keys.length-idx){obj.params=params.join(' ');w.push(name+' 第 '+r.line+' 行函数 '+(func||'（缺失）')+' 以原始参数保留，未核验参数数量或物理含义');}else keys.slice(idx).forEach((k,i)=>obj[k]=params[i]);(data.blocks[target]??=[]).push(obj);}}count=mt.length+data.atoms.length+Object.values(data.blocks).reduce((n,x)=>n+x.length,0);}
 if(id==='topol'){if(!sections.system&&!sections.molecules&&['defaults','atomtypes','moleculetype','atoms'].some(k=>sections[k]))return null;if(!includes.length&&!sections.system?.length&&!sections.molecules?.length)return null;data.fields={ff:includes[0],system:sections.system?.[0]?.raw};data.includes=includes.slice(1).map(path=>({path}));data.molecules=(sections.molecules||[]).map(r=>({name:r.v[0],count:r.v[1]}));count=includes.length+(sections.system?.length||0)+data.molecules.length;if(includes.length)w.push('include 仅记录路径，不读取被包含文件；请核对文件及顺序。');}
-if(!count)return null;return {count,updated,apply(){for(const x of updated)clear(x);if(data.fields){const fs=H.topForms[id].fields;Object.entries(data.fields).forEach(([k,v])=>{if(fs[k])set(fs[k],v,w,k);});}if(data.at){const form=H.topForms.atomtypes;rows(form.tables.atomtypes,data.at,w,'atomtypes');if(id==='forcefield')set(form.fields.comb,data.fields.comb,w,'comb');else if(data.atComb)set(form.fields.comb,data.atComb,w,'comb');}if(id==='molecule'){const form=H.topForms.molecule;rows(form.tables.atoms,data.atoms,w,'atoms');Object.entries(data.blocks).forEach(([k,v])=>{const b=form.blocks[k];if(b&&v.length){b.enabled.checked=true;b.enabled.dispatchEvent(new Event('change'));rows(b.table,v,w,k);}});}if(id==='topol'){const form=H.topForms.topol;rows(form.tables.includes,data.includes,w,'include');rows(form.tables.molecules,data.molecules,w,'molecules');}if(id==='forcefield'||id==='atomtypes'){const f=H.topForms[id].fields.comb;if(f){const other=H.topForms[id==='forcefield'?'atomtypes':'forcefield'].fields.comb, previous=other.value;f.dispatchEvent(new Event('change',{bubbles:true}));if(!updated.includes(id==='forcefield'?'atomtypes':'forcefield'))other.value=previous;}}}};}
+if(!count)return null;return {count,updated,apply(){for(const x of updated)clear(x);if(data.fields){const fs=H.topForms[id].fields;Object.entries(data.fields).forEach(([k,v])=>{if(fs[k])set(fs[k],v,w,k);});}if(data.at){const form=H.topForms.atomtypes;rows(form.tables.atomtypes,data.at,w,'atomtypes');if(data.atComb)set(form.fields.comb,data.atComb,w,'comb');if(form.fields.nbfunc)set(form.fields.nbfunc,data.atNb,w,'nbfunc');}if(id==='molecule'){const form=H.topForms.molecule;rows(form.tables.atoms,data.atoms,w,'atoms');Object.entries(data.blocks).forEach(([k,v])=>{const b=form.blocks[k];if(b&&v.length){b.enabled.checked=true;b.enabled.dispatchEvent(new Event('change'));rows(b.table,v,w,k);}});}if(id==='topol'){const form=H.topForms.topol;rows(form.tables.includes,data.includes,w,'include');rows(form.tables.molecules,data.molecules,w,'molecules');}if(id==='forcefield'||id==='atomtypes'){const otherId=id==='forcefield'?'atomtypes':'forcefield';for(const key of ['comb','nbfunc']){const current=H.topForms[id].fields[key],other=H.topForms[otherId].fields[key];if(!current||!other)continue;const previous=other.value;current.dispatchEvent(new Event('change',{bubbles:true}));if(!updated.includes(otherId)){const selected=current.value;other.value=previous;other.dispatchEvent(new Event('change',{bubbles:true}));current.value=selected;}}}}};}
 H.importText=function(id,text,filename=''){const warnings=[];try{if(!H.sections[id])throw Error('此页面不支持该导入方式');if(id==='gro'){const parsed=H.groForm.importText(String(text));if(H.clearImported)H.clearImported(id);return {ok:true,count:parsed.length,warnings,updated:[id]};}const parsed=H.mdpForms[id]?parseMdp(id,String(text),warnings):topology(id,String(text),filename,warnings);if(!parsed)return {ok:false,count:0,warnings:[...warnings,'未识别到此页面支持的内容，表单未更改。'],updated:[]};parsed.apply();return {ok:true,count:parsed.count,warnings,updated:parsed.updated||[id]};}catch(e){return {ok:false,count:0,warnings:[...warnings,e.message],updated:[]};}};
 Object.entries(H.sections).forEach(([id,section])=>{if(id==='gro')return;const box=H.el('div',{class:'import-panel'});box.append(H.el('h3',{},'导入已有内容'));H.note(box,'导入会替换当前表单，缺失字段留空；只填写识别的字段，请核对后重新生成。内容仅在本页处理，不上传或保存。');const file=H.el('input',{type:'file',accept:'.mdp,.itp,.top,text/plain','aria-label':'选择文件'}),area=H.el('textarea',{rows:'5',placeholder:'或在此粘贴文件内容','aria-label':'粘贴文件内容'}),button=H.el('button',{type:'button'},'导入内容'),summary=H.el('p',{'aria-live':'polite'});let filename='';const run=()=>{const result=H.importText(id,area.value,filename);summary.textContent=(result.ok?'已导入 '+result.count+' 项，更新：'+result.updated.join('、')+'。':'导入失败。')+(result.warnings.length?' '+result.warnings.join('；'):'');};file.addEventListener('change',async()=>{const f=file.files[0];if(!f)return;filename=f.name;try{area.value=await f.text();run();}catch(e){summary.textContent='读取文件失败：'+e.message;}});button.addEventListener('click',run);box.append(file,area,button,summary);section.body.before(box);});
 })(window.Helper);
+
 
 
 const names={forcefield:'forcefield.itp',atomtypes:'atomtypes.itp',molecule:'molecule.itp',topol:'topol.top',gro:'structure.gro',em:'em.mdp',nvt:'nvt.mdp',npt:'npt.mdp',production:'production.mdp'};
